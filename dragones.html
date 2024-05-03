@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GUERRA DE DRAGONES</title>
+    <style type="text/css">
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; 
+        }
+        .ocean-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden; 
+        }
+        .ocean {
+            width: 100%;
+            height: 200%; 
+            position: absolute;
+            bottom: 0; 
+            animation: moveOcean 90s linear infinite;
+            background-image: url("bosque1.jpg");
+            background-size: cover;
+        }
+        @keyframes moveOcean {
+            from {
+                transform: translateY(2%);
+            }
+            to {
+                transform: translateY(-10%);
+            }
+        }
+        .player {
+            width: 150px;
+            height: 75px;
+            background-image: url("dragon1.png");
+            position: absolute;
+        }
+        .enemy {
+            width: 100px;
+            height: 58px;
+            background-image: url("dragon3.png");
+            position: absolute;
+        }
+        .shot {
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ocean-container">
+    <div class="ocean"></div>
+</div>
+
+<div id="players"></div>
+<div id="enemies"></div>
+<div id="shots"></div>
+
+<script type="text/javascript">
+    var player = {
+        left: 450,
+        top: 620
+    };
+
+    var enemies = [
+        {left: 350, top:200},
+        {left: 450, top:250},
+        {left: 550, top:300},
+        {left: 250, top:150},
+        {left: 150, top:350},
+        {left: 600, top:50}
+    ];
+
+    var shots = []; 
+
+    function drawPlayer(){
+        var content = "<div class='player' style='left:"+player.left+"px; top:"+player.top+"px'></div>";
+
+        document.getElementById("players").innerHTML = content;
+    }
+    drawPlayer();
+
+    function drawEnemies() {
+        var content = "";
+        for(var idx=0; idx < enemies.length; idx++){
+            content += "<div class='enemy' style='left:"+enemies[idx].left+"px; top:"+enemies[idx].top+"px'></div>";
+        }
+        document.getElementById("enemies").innerHTML = content;
+    }
+    drawEnemies();
+
+    function drawShots() {
+        var content = "";
+        for(var idx=0; idx < shots.length; idx++){
+            content += "<div class='shot' style='left:"+shots[idx].left+"px; top:"+shots[idx].top+"px'></div>";
+        }
+        document.getElementById("shots").innerHTML = content;
+    }
+    drawShots();
+
+    document.onkeydown = function(e) {
+        if(e.keyCode == 37) { //left
+            player.left = player.left - 10;
+        }
+        if(e.keyCode == 39) { // right
+            player.left = player.left + 10;
+        }
+        if(e.keyCode == 40) { // up
+            player.top = player.top + 10;
+        }
+        if(e.keyCode == 38) { // down
+            player.top = player.top - 10;
+        }
+        if(e.keyCode == 32) { // spacebar para disparar
+            shots.push({left: player.left + 30, top: player.top}); 
+        }
+        drawPlayer();
+        drawShots();
+        checkCollisions(); 
+    };
+    
+    function moveshots() {
+     for (var idx=0; idx<shots.length; idx++) {
+        shots[idx].top = shots[idx].top - 10;
+     }
+    }
+    moveshots() 
+
+    function moveEnemies(){
+        for (var idx = 0; idx<enemies.length; idx++) {
+            enemies[idx].top = enemies[idx].top + 5;
+        }
+    }
+    moveEnemies() 
+
+    function checkCollisions() {
+        for (var i = 0; i < shots.length; i++) {
+            for (var j = 0; j < enemies.length; j++) {
+                if (shots[i] && enemies[j] && shots[i].top <= enemies[j].top + 75 && shots[i].top + 10 >= enemies[j].top && shots[i].left <= enemies[j].left + 70 && shots[i].left + 10 >= enemies[j].left) {
+                    
+                    shots.splice(i, 1);
+                    enemies.splice(j, 1);
+                    drawEnemies();
+                    drawShots();
+                    return; 
+                }
+            }
+        }
+    }
+    function gameLoop(){
+        console.log("gameLopp is running!")
+
+        drawPlayer();
+        drawEnemies();
+        drawShots();
+        moveEnemies();
+        moveshots();
+        setTimeout (gameLoop, 1000)
+    }
+    gameLoop()
+</script>
+
+</body>
+</html>
